@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DownloadOrganizer": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:/Downloads/Aria2/A Silent Voice (2016) [BluRay] [720p] [YTS] [YIFY].zip\""
+    }
+  }
+}
