@@ -20,6 +20,13 @@ public class SystemIoFileSystem : IFileSystem
 		string[] files = GetFiles(sourceFolder);
 		foreach (string file in files)
 		{
+			var ext = Path.GetExtension(file);
+			if (FileExtensions.IgnoredFiles.Contains(ext))
+			{
+				DeleteFile(file);
+				continue;
+			}
+
 			string name = Path.GetFileName(file);
 			string dest = Path.Combine(destFolder, name);
 			MoveFile(file, dest);
@@ -31,5 +38,6 @@ public class SystemIoFileSystem : IFileSystem
 			string dest = Path.Combine(destFolder, name);
 			MoveFolder(folder, dest);
 		}
+		DeleteDirectory(sourceFolder);
 	}
 }

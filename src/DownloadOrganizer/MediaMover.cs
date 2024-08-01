@@ -28,30 +28,15 @@ public class MediaMover(IFileSystem fileSystem)
 
 		var (mediaFolder, seasonFolder) = GetSubFolder(info, targetBasePath);
 
-		if (fileSystem.DirectoryExists(mediaFolder))
+		if (info.IsSeries)
 		{
-			if (info.IsSeries)
-			{
-				fileSystem.CreateDirectory(seasonFolder);
-				File.Move(fullPathToFile, Path.Combine(seasonFolder, fileName));
-			}
-			else
-			{
-				File.Move(fullPathToFile, Path.Combine(mediaFolder, fileName));
-			}
+			fileSystem.CreateDirectory(seasonFolder);
+			fileSystem.MoveFile(fullPathToFile, Path.Combine(seasonFolder, fileName));
 		}
 		else
 		{
-			if (info.IsSeries)
-			{
-				fileSystem.CreateDirectory(seasonFolder);
-				fileSystem.MoveFile(fullPathToFile, Path.Combine(seasonFolder, fileName));
-			}
-			else
-			{
-				fileSystem.CreateDirectory(mediaFolder);
-				fileSystem.MoveFile(fullPathToFile, Path.Combine(mediaFolder, fileName));
-			}
+			fileSystem.CreateDirectory(mediaFolder);
+			fileSystem.MoveFile(fullPathToFile, Path.Combine(mediaFolder, fileName));
 		}
 
 		return info.IsSeries ? seasonFolder : mediaFolder;
@@ -68,41 +53,15 @@ public class MediaMover(IFileSystem fileSystem)
 
 		var (mediaFolder, seasonFolder) = GetSubFolder(info, targetBasePath);
 
-		if (fileSystem.DirectoryExists(mediaFolder))
+		if (info.IsSeries)
 		{
-			if (info.IsSeries)
-			{
-				fileSystem.CreateDirectory(seasonFolder);
-				foreach (var fullPath in fileSystem.GetFiles(fullPathToFolder))
-				{
-					var fileName = Path.GetFileName(fullPath);
-					var target = Path.Combine(seasonFolder, fileName);
-					File.Move(fullPath, target);
-				}
-			}
-			else
-			{
-				foreach (var fullPath in fileSystem.GetFiles(fullPathToFolder))
-				{
-					var fileName = Path.GetFileName(fullPath);
-					var target = Path.Combine(mediaFolder, fileName);
-					File.Move(fullPath, target);
-				}
-			}
+			fileSystem.MoveFolder(fullPathToFolder, seasonFolder);
 		}
 		else
 		{
-			if (info.IsSeries)
-			{
-				fileSystem.MoveFolder(fullPathToFolder, seasonFolder);
-			}
-			else
-			{
-				fileSystem.MoveFolder(fullPathToFolder, mediaFolder);
-			}
+			fileSystem.MoveFolder(fullPathToFolder, mediaFolder);
 		}
-
-		fileSystem.DeleteDirectory(fullPathToFolder);
+		
 		return info.IsSeries ? seasonFolder : mediaFolder;
 	}
 
@@ -147,11 +106,16 @@ public class MediaMover(IFileSystem fileSystem)
 
 		if (info.IsSeries)
 		{
-			var similarDirectories = fileSystem.GetDirectories(Path.Combine(targetBasePath, subDirectory), $"{info.Name} (*)");
-			if(similarDirectories is { Length : 1})
+			var seriesDirectory = Path.Combine(targetBasePath, subDirectory);
+			if(fileSystem.DirectoryExists(seriesDirectory))
 			{
-				mediaFolder = similarDirectories[0];
+				var similarDirectories = fileSystem.GetDirectories(Path.Combine(targetBasePath, subDirectory), $"{info.Name} (*)");
+				if (similarDirectories is { Length: 1 })
+				{
+					mediaFolder = similarDirectories[0];
+				}
 			}
+
 			seasonFolder = Path.Combine(mediaFolder, $"Season {info.SeasonNumber}");
 		}
 
