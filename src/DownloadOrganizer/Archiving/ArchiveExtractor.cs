@@ -26,24 +26,13 @@ public class ArchiveExtractor(IFileSystem fileSystem, IEnumerable<IArchiver> arc
         }
 
 		var extractedFolder = compressedFile.Replace($".{archiver.Extension}", "");
-		archiver.ExtractToDirectory(compressedFile, extractedFolder);
 
-		if (fileSystem.GetDirectories(extractedFolder) is { Length: 1 } extractedSubDirs && fileSystem.GetFiles(extractedFolder) is { Length: 0 })
+		foreach (var item in FileExtensions.MediaFiles)
 		{
-			var innerDirectory = extractedSubDirs[0];
-			foreach (var item in fileSystem.GetFiles(innerDirectory))
-			{
-				var fileName = Path.GetFileName(item);
-				fileSystem.MoveFile(item, Path.Combine(extractedFolder, fileName));
-			}
-			foreach (var item in fileSystem.GetDirectories(innerDirectory))
-			{
-				var dirName = Path.GetFileName(item);
-				fileSystem.MoveFolder(item, Path.Combine(extractedFolder, dirName));
-			}
-			fileSystem.DeleteDirectory(innerDirectory);
+			extractedFolder = extractedFolder.Replace(item, "");
 		}
 
+		archiver.ExtractToDirectory(compressedFile, extractedFolder);
 		fileSystem.DeleteFile(compressedFile);
         return extractedFolder;
 	}

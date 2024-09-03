@@ -16,7 +16,7 @@ public class MediaMover(IFileSystem fileSystem)
 		public bool IsSeries { get; init; }
 	}
 
-	public string MoveFile(string fullPathToFile, string targetBasePath)
+	public async Task<string> MoveFile(string fullPathToFile, string targetBasePath)
 	{
 		var info = GetMediaInfo(fullPathToFile);
 		var fileName = Path.GetFileName(fullPathToFile);
@@ -26,7 +26,7 @@ public class MediaMover(IFileSystem fileSystem)
 			return string.Empty;
 		}
 
-		var (mediaFolder, seasonFolder) = GetSubFolder(info, targetBasePath);
+		var (mediaFolder, seasonFolder) = await GetSubFolder(info, targetBasePath);
 
 		if (info.IsSeries)
 		{
@@ -42,7 +42,7 @@ public class MediaMover(IFileSystem fileSystem)
 		return info.IsSeries ? seasonFolder : mediaFolder;
 	}
 
-	public string MoveFolder(string fullPathToFolder, string targetBasePath)
+	public async Task<string> MoveFolder(string fullPathToFolder, string targetBasePath)
 	{
 		var info = GetMediaInfo(fullPathToFolder);
 
@@ -51,7 +51,7 @@ public class MediaMover(IFileSystem fileSystem)
 			return string.Empty;
 		}
 
-		var (mediaFolder, seasonFolder) = GetSubFolder(info, targetBasePath);
+		var (mediaFolder, seasonFolder) = await GetSubFolder(info, targetBasePath);
 
 		if (info.IsSeries)
 		{
@@ -88,7 +88,7 @@ public class MediaMover(IFileSystem fileSystem)
 		};
 	}
 
-	private (string MediaFolder, string SeasonFolder) GetSubFolder(MediaInfo info, string targetBasePath)
+	private async Task<(string MediaFolder, string SeasonFolder)> GetSubFolder(MediaInfo info, string targetBasePath)
 	{
 		var sb = new StringBuilder();
 
@@ -98,6 +98,13 @@ public class MediaMover(IFileSystem fileSystem)
 			sb.Append($" ({info.Year})");
 		}
 		var newFolderName = sb.ToString();
+
+		var isAnime = await MalService.IsAnime(info.Name);
+		if(isAnime)
+		{
+			var animeFolder = Path.Combine(targetBasePath, "Anime", newFolderName);
+			return (animeFolder, animeFolder);
+		}
 
 		var subDirectory = info.IsSeries ? "Series" : "Movies";
 		var mediaFolder = Path.Combine(targetBasePath, subDirectory, newFolderName);

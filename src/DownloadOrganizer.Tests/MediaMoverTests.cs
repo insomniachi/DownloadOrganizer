@@ -9,7 +9,15 @@ namespace DownloadOrganizer.Tests
 		public const string MediaFolder = @"D:\Media";
 
 		[Fact]
-		public void MovieFolder_MoviesToCorrectSubFolder()
+		public async Task IsAnimeTest()
+		{
+			var isAnime = await MalService.IsAnime("The Garden of Words");
+
+			Assert.True(isAnime);
+		}
+
+		[Fact]
+		public async Task MovieFolder_MoviesToCorrectSubFolder()
 		{
 			var movieFolder = Path.Combine(DownloadsFolder, "A Quiet Place Part II (2020) [2160p] [4K][WEB] [HDR][5.1][YTS.MXJ]");
 			var destinationFolder = Path.Combine(MediaFolder, "Movies", "A Quiet Place Part II (2020)");
@@ -20,14 +28,14 @@ namespace DownloadOrganizer.Tests
 			fileSystem.Setup(x => x.GetFiles(movieFolder)).Returns([Path.Combine(movieFolder, movieName)]);
 			var mover = new MediaMover(fileSystem.Object);
 
-			var movedFolder = mover.MoveFolder(movieFolder, MediaFolder);
+			var movedFolder = await mover.MoveFolder(movieFolder, MediaFolder);
 
 			Assert.Equal(destinationFolder, movedFolder);
 			fileSystem.Verify(x => x.MoveFile(Path.Combine(movieFolder, movieName), Path.Combine(destinationFolder, movieName)), Times.Once);
 		}
 
 		[Fact]
-		public void NewSeries_CreatesNewFolderAndMoves()
+		public async Task NewSeries_CreatesNewFolderAndMoves()
 		{
 			var seriesFolder = Path.Combine(DownloadsFolder, "Game of Thrones S08 COMPLETE 720p WEB-DL*264 ESubs[4GB][MP4][Season 8]");
 			var destinationFolder = Path.Combine(MediaFolder, "Series", "Game of Thrones", "Season 8");
@@ -46,7 +54,7 @@ namespace DownloadOrganizer.Tests
 				]);
 			var mover = new MediaMover(fileSystem.Object);
 
-			var movedFolder = mover.MoveFolder(seriesFolder, MediaFolder);
+			var movedFolder = await mover.MoveFolder(seriesFolder, MediaFolder);
 
 			Assert.Equal(destinationFolder, movedFolder);
 			fileSystem.Verify(x => x.MoveFile(Path.Combine(seriesFolder, "1.mkv"), Path.Combine(destinationFolder, "1.mkv")), Times.Once);
@@ -61,7 +69,7 @@ namespace DownloadOrganizer.Tests
 		[Theory]
 		[InlineData(true)]
 		[InlineData(false)]
-		public void ExistingSeriesWithYear_MovesNewEpisodeToCorrectFolder(bool existingFolderHasYear)
+		public async Task ExistingSeriesWithYear_MovesNewEpisodeToCorrectFolder(bool existingFolderHasYear)
 		{
 			var episodeFolder = Path.Combine(DownloadsFolder, "House of the Dragon S02E05 1080p MAX WEB-DL DDP5 1 Atmos H 264-FLUX[TGx]");
 			var destinationFolder = existingFolderHasYear
@@ -87,7 +95,7 @@ namespace DownloadOrganizer.Tests
 				]);
 			var mover = new MediaMover(fileSystem.Object);
 			
-			var movedFolder = mover.MoveFolder(episodeFolder, MediaFolder);
+			var movedFolder = await mover.MoveFolder(episodeFolder, MediaFolder);
 			
 			Assert.Equal(destinationFolder, movedFolder);
 			fileSystem.Verify(x => x.MoveFile(Path.Combine(episodeFolder, "7.mkv"), Path.Combine(destinationFolder, "7.mkv")), Times.Once);

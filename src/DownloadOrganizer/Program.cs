@@ -9,7 +9,7 @@ app.Add("run", Commands.Run);
 
 try
 {
-	app.Run(args);
+	await app.RunAsync(args);
 }
 catch (Exception ex)
 {

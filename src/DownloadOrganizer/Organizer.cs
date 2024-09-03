@@ -12,19 +12,19 @@ public static class Organizer
 		var path = Path.Combine(appData, "DownloadOrganizer", "appsettings.json");
 		if (File.Exists(path))
 		{
-			appSettings = JsonSerializer.Deserialize(File.ReadAllText(path), AppSettingsJsonSerializerContext.Default.AppSettings);
+			appSettings = JsonSerializer.Deserialize(File.ReadAllText(path), AppJsonSerializerContext.Default.AppSettings);
 		}
 
 		return appSettings;
 	}
 
-	public static void Organize()
+	public static async Task Organize()
 	{
 		var appSettings = GetAppSettings();
-		Organize(appSettings.DownloadsDirectory, appSettings.MediaDirectory);
+		await Organize(appSettings.DownloadsDirectory, appSettings.MediaDirectory);
 	}
 
-	public static void Organize(string sourceDir, string targetDir)
+	public static async Task Organize(string sourceDir, string targetDir)
 	{
 		Log.WriteLog($"Organizing {sourceDir}");
 
@@ -40,7 +40,7 @@ public static class Organizer
 			var files = fileSystem.GetFiles(mediaFolder);
 			if (files.Any(x => FileExtensions.MediaFiles.Contains(Path.GetExtension(x))))
 			{
-				mover.MoveFolder(mediaFolder, targetDir);
+				await mover.MoveFolder(mediaFolder, targetDir);
 			}
 		}
 		foreach (var mediaFile in fileSystem.GetFiles(sourceDir, "*.*", SearchOption.TopDirectoryOnly))
@@ -51,11 +51,11 @@ public static class Organizer
 			}
 
 			Log.WriteLog($"Found media file : {mediaFile}");
-			mover.MoveFile(mediaFile, targetDir);
+			await mover.MoveFile(mediaFile, targetDir);
 		}
 	}
 
-	public static void Organize(string completedDownload)
+	public static async Task Organize(string completedDownload)
 	{
 		Log.WriteLog($"Organizing download : {completedDownload}");
 		var fileSystem = new SystemIoFileSystem();
@@ -69,7 +69,16 @@ public static class Organizer
 			var archiveExtractor = new ArchiveExtractor(fileSystem, [new ZipArchiver()]);
 			var extracted = archiveExtractor.ExtractArchive(completedDownload);
 			Log.WriteLog($"Moving : {extracted}");
-			mover.MoveFolder(extracted, appSettings.MediaDirectory);
+			if (fileSystem.GetDirectories(extracted) is { Length: 1 } extractedSubDirs && fileSystem.GetFiles(extracted) is { Length: 0 })
+			{
+				var innerDirectory = extractedSubDirs[0];
+				await mover.MoveFolder(innerDirectory, appSettings.MediaDirectory);
+				fileSystem.DeleteDirectory(extracted);
+			}
+			else
+			{
+				await mover.MoveFolder(extracted, appSettings.MediaDirectory);
+			}
 		}
 		else
 		{
@@ -80,13 +89,13 @@ public static class Organizer
 			{
 				if(FileExtensions.MediaFiles.Contains(ext))
 				{
-					mover.MoveFile(completedDownload, appSettings.MediaDirectory);
+					await mover.MoveFile(completedDownload, appSettings.MediaDirectory);
 				}
 			}
 			else
 			{
 				Log.WriteLog($"Moving : {dir}");
-				mover.MoveFolder(dir, appSettings.MediaDirectory);
+				await mover.MoveFolder(dir, appSettings.MediaDirectory);
 			}
 		}
 
