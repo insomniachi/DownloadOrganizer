@@ -1,12 +1,16 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 using DownloadOrganizer.Contracts;
 using DownloadOrganizer.Parsing;
 
 namespace DownloadOrganizer;
 
 
-public class MediaMover(IFileSystem fileSystem)
+public partial class MediaMover(IFileSystem fileSystem)
 {
+	[GeneratedRegex(@"(www 1TamilMV \w+ - ).*")]
+	private static partial Regex TamilMvUrl();
+
 	class MediaInfo
 	{
 		public string Name { get; init; }
@@ -14,6 +18,7 @@ public class MediaMover(IFileSystem fileSystem)
 		public int? SeasonNumber { get; init; }
 		public int? Episode { get; init; }
 		public bool IsSeries { get; init; }
+		public bool IsMalayalam { get; init; }
 	}
 
 	public async Task<string> MoveFile(string fullPathToFile, string targetBasePath)
@@ -77,14 +82,23 @@ public class MediaMover(IFileSystem fileSystem)
 		var mkvFiles = fileSystem.GetFiles(fullPath, "*.mkv", SearchOption.AllDirectories);
 		var mp4Files = fileSystem.GetFiles(fullPath, "*.mpv", SearchOption.AllDirectories);
 		var details = TorrentNameParser.Parse(name);
+		var movieName = details.Title;
+		var isMalayalam = false;
+		var match = TamilMvUrl().Match(movieName);
+		if (match.Success)
+		{
+			isMalayalam = true;
+			movieName = movieName.Replace(match.Groups[1].Value, "");
+		}
 		
 		return new MediaInfo
 		{
-			Name = details.Title,
+			Name = movieName,
 			Year = details.Year,
 			SeasonNumber = details.Season,
 			Episode = details.Episode,
-			IsSeries = mkvFiles.Length > 1 || mp4Files.Length > 1 || details.Season > 0
+			IsSeries = mkvFiles.Length > 1 || mp4Files.Length > 1 || details.Season > 0,
+			IsMalayalam = isMalayalam
 		};
 	}
 
@@ -99,7 +113,7 @@ public class MediaMover(IFileSystem fileSystem)
 		}
 		var newFolderName = sb.ToString();
 
-		var isAnime = await MalService.IsAnime(info.Name);
+		var isAnime = await MalService.IsAnime(info.Name);	
 		if(isAnime)
 		{
 			var animeFolder = Path.Combine(targetBasePath, "Anime", newFolderName);
@@ -107,9 +121,12 @@ public class MediaMover(IFileSystem fileSystem)
 		}
 
 		var subDirectory = info.IsSeries ? "Series" : "Movies";
+		if (info.IsMalayalam)
+		{
+			subDirectory += " - Malayalam";
+		}
 		var mediaFolder = Path.Combine(targetBasePath, subDirectory, newFolderName);
 		var seasonFolder = string.Empty;
-
 
 		if (info.IsSeries)
 		{

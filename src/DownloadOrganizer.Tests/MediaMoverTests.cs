@@ -17,6 +17,24 @@ namespace DownloadOrganizer.Tests
 		}
 
 		[Fact]
+		public async Task MoverTrimsTamilMVfromName()
+		{
+			var movieFolder = Path.Combine(DownloadsFolder, "www 1TamilMV tf - CID Ramachandran Retd  SI (2024) Malayalam TRUE WEB-DL - 1080p - AVC - AAC - 2.9GB - ESub");
+			var destinationFolder = Path.Combine(MediaFolder, "Movies - Malayalam", "CID Ramachandran Retd  SI (2024)");
+			var movieName = "movie.mkv";
+			var fileSystem = new Mock<IFileSystem>();
+			fileSystem.Setup(x => x.GetDirectories(DownloadsFolder)).Returns([movieFolder]);
+			fileSystem.Setup(x => x.DirectoryExists(destinationFolder)).Returns(false);
+			fileSystem.Setup(x => x.GetFiles(movieFolder)).Returns([Path.Combine(movieFolder, movieName)]);
+			var mover = new MediaMover(fileSystem.Object);
+
+			var movedFolder = await mover.MoveFolder(movieFolder, MediaFolder);
+
+			Assert.Equal(destinationFolder, movedFolder);
+			fileSystem.Verify(x => x.MoveFolder(movieFolder, destinationFolder), Times.Once);
+		}
+
+		[Fact]
 		public async Task MovieFolder_MoviesToCorrectSubFolder()
 		{
 			var movieFolder = Path.Combine(DownloadsFolder, "A Quiet Place Part II (2020) [2160p] [4K][WEB] [HDR][5.1][YTS.MXJ]");
@@ -31,7 +49,7 @@ namespace DownloadOrganizer.Tests
 			var movedFolder = await mover.MoveFolder(movieFolder, MediaFolder);
 
 			Assert.Equal(destinationFolder, movedFolder);
-			fileSystem.Verify(x => x.MoveFile(Path.Combine(movieFolder, movieName), Path.Combine(destinationFolder, movieName)), Times.Once);
+			fileSystem.Verify(x => x.MoveFolder(movieFolder, destinationFolder), Times.Once);
 		}
 
 		[Fact]
