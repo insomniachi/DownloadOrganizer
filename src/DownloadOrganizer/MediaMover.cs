@@ -121,10 +121,14 @@ public partial class MediaMover(IFileSystem fileSystem)
 		}
 
 		var subDirectory = info.IsSeries ? "Series" : "Movies";
-		if (info.IsMalayalam)
+
+		if(!info.IsSeries)
 		{
-			subDirectory += " - Malayalam";
+			subDirectory = info.IsMalayalam
+				? Path.Combine(subDirectory, "Malayalam")
+				: Path.Combine(subDirectory, "English");
 		}
+
 		var mediaFolder = Path.Combine(targetBasePath, subDirectory, newFolderName);
 		var seasonFolder = string.Empty;
 

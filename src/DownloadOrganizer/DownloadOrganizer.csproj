@@ -6,7 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <InvariantGlobalization>true</InvariantGlobalization>
-	<PublishAot>true</PublishAot>
 	<Nullable>disable</Nullable>
 	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
