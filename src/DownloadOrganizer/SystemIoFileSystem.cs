@@ -1,4 +1,5 @@
 ﻿using DownloadOrganizer.Contracts;
+using System.Runtime.InteropServices;
 
 namespace DownloadOrganizer;
 
@@ -17,6 +18,11 @@ public class SystemIoFileSystem : IFileSystem
 	public void MoveFolder(string sourceFolder, string destFolder)
 	{
 		CreateDirectory(destFolder);
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+		{
+			var directoryInfo = new DirectoryInfo(destFolder);
+			directoryInfo.UnixFileMode = UnixFileMode.UserRead | UnixFileMode.UserWrite| UnixFileMode.UserExecute| UnixFileMode.GroupRead | UnixFileMode.GroupWrite | UnixFileMode.GroupExecute | UnixFileMode.OtherRead | UnixFileMode.OtherWrite | UnixFileMode.OtherExecute;
+		}
 		string[] files = GetFiles(sourceFolder);
 		foreach (string file in files)
 		{
@@ -30,6 +36,10 @@ public class SystemIoFileSystem : IFileSystem
 			string name = Path.GetFileName(file);
 			string dest = Path.Combine(destFolder, name);
 			MoveFile(file, dest);
+			if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+			{
+				File.SetUnixFileMode(dest, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute | UnixFileMode.GroupRead | UnixFileMode.GroupWrite | UnixFileMode.GroupExecute | UnixFileMode.OtherRead | UnixFileMode.OtherWrite | UnixFileMode.OtherExecute);
+			}
 		}
 		string[] folders = GetDirectories(sourceFolder);
 		foreach (string folder in folders)
