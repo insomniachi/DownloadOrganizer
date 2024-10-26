@@ -4,6 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>9263b51f-c7b7-4e71-a4fa-d5e6aa78b692</UserSecretsId>
+    <UserSecretsId>9263b51f-c7b7-4e71-a4fa-d5e6aa78b692</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,10 +15,6 @@
   <ItemGroup>
 	<PackageReference Include="Telegram.Bot" Version="21.11.0" />
 	<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="8.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Properties\launchSettings.json" />
   </ItemGroup>
 
 </Project>

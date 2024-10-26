@@ -7,7 +7,7 @@ using Telegram.Bot;
 
 var builder = Host.CreateApplicationBuilder(args);
 #if DEBUG
-builder.Configuration.AddEnvironmentVariables();
+builder.Configuration.AddUserSecrets<Program>();
 #else
 var confPath = builder.Configuration.GetValue<string>("ConfigPath");
 if (File.Exists(confPath))
