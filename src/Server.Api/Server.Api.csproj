@@ -15,4 +15,8 @@
 	<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="8.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Properties\launchSettings.json" />
+  </ItemGroup>
+
 </Project>
