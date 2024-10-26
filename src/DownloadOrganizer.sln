@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DownloadOrganizer", "Downlo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DownloadOrganizer.Tests", "DownloadOrganizer.Tests\DownloadOrganizer.Tests.csproj", "{C6A6E01F-B40F-4A22-B99C-F26A1A2C5836}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aria2TelegramBot", "Aria2TelegramBot\Aria2TelegramBot.csproj", "{61E6522A-1E0C-47C0-99D0-AE261E2CEC01}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Api", "Server.Api\Server.Api.csproj", "{398B8FEC-6232-44FA-A1A2-F75A6345CC87}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{C6A6E01F-B40F-4A22-B99C-F26A1A2C5836}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6A6E01F-B40F-4A22-B99C-F26A1A2C5836}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6A6E01F-B40F-4A22-B99C-F26A1A2C5836}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61E6522A-1E0C-47C0-99D0-AE261E2CEC01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61E6522A-1E0C-47C0-99D0-AE261E2CEC01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61E6522A-1E0C-47C0-99D0-AE261E2CEC01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61E6522A-1E0C-47C0-99D0-AE261E2CEC01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{398B8FEC-6232-44FA-A1A2-F75A6345CC87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{398B8FEC-6232-44FA-A1A2-F75A6345CC87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{398B8FEC-6232-44FA-A1A2-F75A6345CC87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{398B8FEC-6232-44FA-A1A2-F75A6345CC87}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
