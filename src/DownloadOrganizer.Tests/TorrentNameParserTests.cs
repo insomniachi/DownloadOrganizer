@@ -50,6 +50,20 @@ public class TorrentNameParserTests
 		Assert.Equal(expected.Garbage, actual.Garbage);
 	}
 
+	[Theory]
+	[InlineData("Do Patti", "Hindi")]
+	[InlineData("Vettaiyan", "Tamil")]
+	[InlineData("Love Reddy", "Kannada")]
+	[InlineData("A.R.M", "Malayalam")]
+	public void ParseLanguage(string title, string language)
+	{
+		var imdb = new IMDb.IMDb();
+		var results = imdb.search(title, IMDb.eSearch.Titles);
+		var result = imdb.title(results.titles[0].id);
+
+		Assert.Equal(language, result.languages[0].name);
+	}
+
 	private readonly Dictionary<string, TorrentNameDetails> _expectedResults = new()
 	{
 		// Movies

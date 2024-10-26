@@ -18,7 +18,7 @@ public partial class MediaMover(IFileSystem fileSystem)
 		public int? SeasonNumber { get; init; }
 		public int? Episode { get; init; }
 		public bool IsSeries { get; init; }
-		public bool IsMalayalam { get; init; }
+		public string Language { get; init; } = "";
 	}
 
 	public async Task<string> MoveFile(string fullPathToFile, string targetBasePath)
@@ -83,11 +83,9 @@ public partial class MediaMover(IFileSystem fileSystem)
 		var mp4Files = fileSystem.GetFiles(fullPath, "*.mpv", SearchOption.AllDirectories);
 		var details = TorrentNameParser.Parse(name);
 		var movieName = details.Title;
-		var isMalayalam = false;
 		var match = TamilMvUrl().Match(movieName);
 		if (match.Success)
 		{
-			isMalayalam = true;
 			movieName = movieName.Replace(match.Groups[1].Value, "");
 		}
 		
@@ -98,7 +96,7 @@ public partial class MediaMover(IFileSystem fileSystem)
 			SeasonNumber = details.Season,
 			Episode = details.Episode,
 			IsSeries = mkvFiles.Length > 1 || mp4Files.Length > 1 || details.Season > 0,
-			IsMalayalam = isMalayalam
+			Language = GetLanguage(movieName)
 		};
 	}
 
@@ -122,11 +120,9 @@ public partial class MediaMover(IFileSystem fileSystem)
 
 		var subDirectory = info.IsSeries ? "Series" : "Movies";
 
-		if(!info.IsSeries)
+		if(!info.IsSeries && !string.IsNullOrEmpty(info.Language))
 		{
-			subDirectory = info.IsMalayalam
-				? Path.Combine(subDirectory, "Malayalam")
-				: Path.Combine(subDirectory, "English");
+			subDirectory = Path.Combine(subDirectory, info.Language);
 		}
 
 		var mediaFolder = Path.Combine(targetBasePath, subDirectory, newFolderName);
@@ -148,5 +144,25 @@ public partial class MediaMover(IFileSystem fileSystem)
 		}
 
 		return (mediaFolder, seasonFolder);
+	}
+
+	private static string GetLanguage(string title)
+	{
+		try
+		{
+			var imdb = new IMDb.IMDb();
+			var results = imdb.search(title, IMDb.eSearch.Titles);
+			if (results.titles is not { Count: > 0 })
+			{
+				return "";
+			}
+
+			var fullResult = imdb.title(results.titles[0].id);
+			return fullResult.languages[0].name.Trim();
+		}
+		catch (Exception)
+		{
+			return "";
+		}
 	}
 }
