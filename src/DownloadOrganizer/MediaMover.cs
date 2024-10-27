@@ -11,12 +11,11 @@ public partial class MediaMover(IFileSystem fileSystem)
 	[GeneratedRegex(@"(www 1TamilMV \w+ - ).*")]
 	private static partial Regex TamilMvUrl();
 
-	class MediaInfo
+	private class MediaInfo
 	{
 		public string Name { get; init; }
 		public int? Year { get; init; }
 		public int? SeasonNumber { get; init; }
-		public int? Episode { get; init; }
 		public bool IsSeries { get; init; }
 		public string Language { get; init; } = "";
 	}
@@ -58,15 +57,8 @@ public partial class MediaMover(IFileSystem fileSystem)
 
 		var (mediaFolder, seasonFolder) = await GetSubFolder(info, targetBasePath);
 
-		if (info.IsSeries)
-		{
-			fileSystem.MoveFolder(fullPathToFolder, seasonFolder);
-		}
-		else
-		{
-			fileSystem.MoveFolder(fullPathToFolder, mediaFolder);
-		}
-		
+		fileSystem.MoveFolder(fullPathToFolder, info.IsSeries ? seasonFolder : mediaFolder);
+
 		return info.IsSeries ? seasonFolder : mediaFolder;
 	}
 
@@ -94,7 +86,6 @@ public partial class MediaMover(IFileSystem fileSystem)
 			Name = movieName,
 			Year = details.Year,
 			SeasonNumber = details.Season,
-			Episode = details.Episode,
 			IsSeries = mkvFiles.Length > 1 || mp4Files.Length > 1 || details.Season > 0,
 			Language = GetLanguage(movieName)
 		};

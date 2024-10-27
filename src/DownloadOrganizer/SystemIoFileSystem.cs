@@ -23,8 +23,8 @@ public class SystemIoFileSystem : IFileSystem
 			var directoryInfo = new DirectoryInfo(destFolder);
 			directoryInfo.UnixFileMode = UnixFileMode.UserRead | UnixFileMode.UserWrite| UnixFileMode.UserExecute| UnixFileMode.GroupRead | UnixFileMode.GroupWrite | UnixFileMode.GroupExecute | UnixFileMode.OtherRead | UnixFileMode.OtherWrite | UnixFileMode.OtherExecute;
 		}
-		string[] files = GetFiles(sourceFolder);
-		foreach (string file in files)
+		var files = GetFiles(sourceFolder);
+		foreach (var file in files)
 		{
 			var ext = Path.GetExtension(file);
 			if (FileExtensions.IgnoredFiles.Contains(ext))
@@ -33,19 +33,19 @@ public class SystemIoFileSystem : IFileSystem
 				continue;
 			}
 
-			string name = Path.GetFileName(file);
-			string dest = Path.Combine(destFolder, name);
+			var name = Path.GetFileName(file);
+			var dest = Path.Combine(destFolder, name);
 			MoveFile(file, dest);
 			if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 			{
 				File.SetUnixFileMode(dest, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute | UnixFileMode.GroupRead | UnixFileMode.GroupWrite | UnixFileMode.GroupExecute | UnixFileMode.OtherRead | UnixFileMode.OtherWrite | UnixFileMode.OtherExecute);
 			}
 		}
-		string[] folders = GetDirectories(sourceFolder);
-		foreach (string folder in folders)
+		var folders = GetDirectories(sourceFolder);
+		foreach (var folder in folders)
 		{
-			string name = Path.GetFileName(folder);
-			string dest = Path.Combine(destFolder, name);
+			var name = Path.GetFileName(folder);
+			var dest = Path.Combine(destFolder, name);
 			MoveFolder(folder, dest);
 		}
 		DeleteDirectory(sourceFolder);

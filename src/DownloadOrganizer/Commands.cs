@@ -34,7 +34,7 @@ public static class Commands
 	}
 
 	/// <summary>
-	///  Organize the contents of your downloads directory into the media directory in a single go configured in appsettings
+	///  Organize the contents of your downloads directory into the media directory in a single go configured in app settings
 	/// </summary>
 	public static Task Run() => Organizer.Organize();
 }
