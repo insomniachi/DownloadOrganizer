@@ -1,4 +1,6 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Server.Api;
 
 #if !DEBUG
@@ -17,6 +19,7 @@ if (File.Exists(confPath))
 }
 #endif
 
+builder.Services.AddValidatorsFromAssemblyContaining<Program>(ServiceLifetime.Transient);
 builder.Services.AddSystemd();
 builder.Services.AddHttpClient();
 builder.Services.AddTelegramBot();
@@ -25,15 +28,27 @@ builder.Services.AddTelegramBot();
 builder.WebHost.UseUrls("http://0.0.0.0:4000");
 #endif
 
+builder.Services
+    .AddOptions<JellyfinSettings>()
+    .Bind(builder.Configuration.GetRequiredSection("Jellyfin"))
+    .ValidateFluently()
+    .ValidateOnStart();
+
+builder.Services
+    .AddOptions<TelegramSettings>()
+    .Bind(builder.Configuration.GetRequiredSection("Telegram"))
+    .ValidateFluently()
+    .ValidateOnStart();
 
 var app = builder.Build();
 
 app.MapPost("/Jellyfin/Added", async (JellyfinAddedEvent item,
     [FromServices] ITelegramBotClient bot,
     [FromServices] IHttpClientFactory httpClientFactory,
-    [FromServices] IConfiguration configuration) =>
+    [FromServices] IOptions<TelegramSettings> telegramSettings,
+    [FromServices] IOptions<JellyfinSettings> jellyfinSettings) =>
 {
-    await JellyfinWebhook.HandleItemAdded(item, bot, httpClientFactory, configuration);
+    await JellyfinWebhook.HandleItemAdded(item, bot, httpClientFactory, jellyfinSettings.Value, telegramSettings.Value);
 });
 
 app.Run();

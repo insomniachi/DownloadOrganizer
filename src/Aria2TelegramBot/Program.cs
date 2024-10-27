@@ -1,5 +1,6 @@
 ﻿using Aria2NET;
 using Aria2TelegramBot;
+using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -17,12 +18,26 @@ if (File.Exists(confPath))
 #endif
 
 
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddSystemd();
 builder.Services.AddHttpClient();
 builder.Services.AddHostedService<Worker>();
 builder.Services.AddAria2();
 builder.Services.AddTelegramBot();
 builder.Services.AddTransient<UpdateHandler>();
+
+builder.Services
+    .AddOptions<Aria2Settings>()
+    .Bind(builder.Configuration.GetRequiredSection("Aria2"))
+    .ValidateFluently()
+    .ValidateOnStart();
+
+builder.Services
+    .AddOptions<TelegramSettings>()
+    .Bind(builder.Configuration.GetRequiredSection("Telegram"))
+    .ValidateFluently()
+    .ValidateOnStart();
+
 
 var app = builder.Build();
 

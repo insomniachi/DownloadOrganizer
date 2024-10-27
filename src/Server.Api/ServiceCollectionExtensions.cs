@@ -1,3 +1,6 @@
+using Aria2TelegramBot;
+using FluentValidation;
+using Microsoft.Extensions.Options;
 using Telegram.Bot;
 
 namespace Server.Api;
@@ -18,5 +21,13 @@ public static class ServiceCollectionExtensions
 
             return new TelegramBotClient(botToken);
         });
+    }
+    
+    public static OptionsBuilder<TOptions> ValidateFluently<TOptions>(
+        this OptionsBuilder<TOptions> optionsBuilder)
+        where TOptions : class
+    {
+        optionsBuilder.Services.AddTransient<IValidateOptions<TOptions>>(x => new FluentValidationOptions<TOptions>(optionsBuilder.Name, x.GetRequiredService<IValidator<TOptions>>()));
+        return optionsBuilder;
     }
 }

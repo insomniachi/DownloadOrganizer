@@ -1,6 +1,7 @@
 using Aria2NET;
-using Microsoft.Extensions.Configuration;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Telegram.Bot;
 
 namespace Aria2TelegramBot;
@@ -11,16 +12,8 @@ public static class ServiceCollectionExtensions
     {
         return services.AddSingleton(sp =>
         {
-            var configuration = sp.GetRequiredService<IConfiguration>();
-            var jsonRpcUrl = configuration.GetValue<string>("Aria2Url");
-            var secret = configuration.GetValue<string>("Aria2Secret");
-
-            if (string.IsNullOrEmpty(jsonRpcUrl) || string.IsNullOrEmpty(secret))
-            {
-                throw new Exception("Please provide Aria2Url and Aria2Secret");
-            }
-    
-            return new Aria2NetClient(jsonRpcUrl, secret); 
+            var settings = sp.GetRequiredService<IOptions<Aria2Settings>>().Value;
+            return new Aria2NetClient(settings.RpcUrl, settings.Secret); 
         });
     }
 
@@ -28,15 +21,16 @@ public static class ServiceCollectionExtensions
     {
         return services.AddSingleton<ITelegramBotClient>(sp =>
         {
-            var configuration = sp.GetRequiredService<IConfiguration>();
-            var botToken = configuration.GetValue<string>("TelegramBotToken");
-
-            if (string.IsNullOrEmpty(botToken))
-            {
-                throw new Exception("Please provide TelegramBotToken");
-            }
-
-            return new TelegramBotClient(botToken);
+            var settings = sp.GetRequiredService<IOptions<TelegramSettings>>().Value;
+            return new TelegramBotClient(settings.BotToken);
         });
+    }
+    
+    public static OptionsBuilder<TOptions> ValidateFluently<TOptions>(
+        this OptionsBuilder<TOptions> optionsBuilder)
+        where TOptions : class
+    {
+        optionsBuilder.Services.AddSingleton<IValidateOptions<TOptions>>(x => new FluentValidationOptions<TOptions>(optionsBuilder.Name, x.GetRequiredService<IValidator<TOptions>>()));
+        return optionsBuilder;
     }
 }

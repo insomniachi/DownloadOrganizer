@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Aria2.NET" Version="1.0.5" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.10.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="8.0.1" />
     <PackageReference Include="Telegram.Bot" Version="21.11.0" />
   </ItemGroup>
