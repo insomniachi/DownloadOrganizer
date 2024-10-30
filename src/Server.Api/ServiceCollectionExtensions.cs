@@ -11,15 +11,8 @@ public static class ServiceCollectionExtensions
     {
         return services.AddSingleton<ITelegramBotClient>(sp =>
         {
-            var configuration = sp.GetRequiredService<IConfiguration>();
-            var botToken = configuration.GetValue<string>("TelegramBotToken");
-
-            if (string.IsNullOrEmpty(botToken))
-            {
-                throw new Exception("Please provide TelegramBotToken");
-            }
-
-            return new TelegramBotClient(botToken);
+            var telegramSettings = sp.GetRequiredService<IOptions<TelegramSettings>>();
+            return new TelegramBotClient(telegramSettings.Value.BotToken);
         });
     }
     
