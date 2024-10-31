@@ -38,16 +38,16 @@ public class JellyfinWebhook(ITelegramBotClient bot,
                         $"<b>{item.SeriesName} ({item.Year})</b>\n" +
                         $"<b><em>{item.Name}</em></b>\n" +
                         $"{item.Overview}\n\n" +
-                        $"<b>Runtime</b> : {item.Runtime}",
+                        $"<b>Runtime</b> : {item.RunTime}",
             "Episode" => $"<b>{item.ItemType} Now Available</b>\n\n" +
                          $"<b>{item.SeriesName} ({item.Year})</b> - <b>S{item.SeasonNumber00}E{item.EpisodeNumber00}</b> - <b><em>{item.Name}</em></b>\n" +
                          $"{item.Overview}\n\n" +
-                         $"<b>Runtime</b> : {item.Runtime}\n\n" +
+                         $"<b>Runtime</b> : {item.RunTime}\n\n" +
                          $"<a href=\"{webUrl}/Items/{item.ItemId}/Download?api_key={jellyfinToken}\">Download Now!</a>",
             _ => $"<b>{item.ItemType} Now Available</b>\n\n" + 
                  $"<b>{item.Name} ({item.Year})</b>\n" +
                  $"{item.Overview}\n\n" +
-                 $"<b>Runtime</b> : {item.Runtime}\n\n" +
+                 $"<b>Runtime</b> : {item.RunTime}\n\n" +
                  $"<a href=\"{webUrl}/Items/{item.ItemId}/Download?api_key={jellyfinToken}\">Download Now!</a>"
         };
 
@@ -93,7 +93,7 @@ public class JellyfinWebhook(ITelegramBotClient bot,
                 sb.Append($" S{playbackItem.SeasonNumber00}E{playbackItem.EpisodeNumber00} ");
             }
 
-            sb.Append($"from ({playbackItem.PlaybackPosition}/{playbackItem.Runtime}) on {item.DeviceName} ({item.ClientName})");
+            sb.Append($"from ({playbackItem.PlaybackPosition}/{playbackItem.RunTime}) on {item.DeviceName} ({item.ClientName})");
 
             return sb.ToString();
         }
@@ -134,7 +134,7 @@ public class JellyfinWebhook(ITelegramBotClient bot,
                 sb.Append($" S{playbackItem.SeasonNumber00}E{playbackItem.EpisodeNumber00} ");
             }
 
-            sb.Append($"at ({playbackItem.PlaybackPosition}/{playbackItem.Runtime})");
+            sb.Append($"at ({playbackItem.PlaybackPosition}/{playbackItem.RunTime})");
 
             return sb.ToString();
         }

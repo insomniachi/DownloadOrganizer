@@ -12,7 +12,7 @@ public class ItemAdded
     public string SeasonNumber00 { get; set; } = string.Empty;
     public string EpisodeNumber00 { get; set; } = string.Empty;
     public string Overview { get; set; } = string.Empty;
-    public string Runtime { get; set; } = string.Empty;
+    public string RunTime { get; set; } = string.Empty;
     public string ItemId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
 }
@@ -29,7 +29,7 @@ public class PlaybackStarted
     public string ClientName { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string PlaybackPosition { get; set; } = string.Empty;
-    public string Runtime { get; set; } = string.Empty;
+    public string RunTime { get; set; } = string.Empty;
     public string ItemType { get; set; } = string.Empty;
     public string SeasonNumber00 { get; set; } = string.Empty;
     public string EpisodeNumber00 { get; set; } = string.Empty;
@@ -40,7 +40,7 @@ public class PlaybackStopped
     public string NotificationUsername { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string PlaybackPosition { get; set; } = string.Empty;
-    public string Runtime { get; set; } = string.Empty;
+    public string RunTime { get; set; } = string.Empty;
     public bool PlayedToCompletion { get; set; }
     public string ItemType { get; set; } = string.Empty;
     public string SeasonNumber00 { get; set; } = string.Empty;

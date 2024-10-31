@@ -1,5 +1,6 @@
 using System.Text.Json;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Server.Api;
 
 #if !DEBUG
@@ -21,6 +22,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>(ServiceLifetime.Tr
 builder.Services.AddSystemd();
 builder.Services.AddHttpClient();
 builder.Services.AddTelegramBot();
+builder.Services.AddTransient<JellyfinWebhook>();
 
 #if !DEBUG
 builder.WebHost.UseUrls("http://0.0.0.0:4000");
@@ -40,7 +42,7 @@ builder.Services
 
 var app = builder.Build();
 
-app.MapPost("/Jellyfin/Webhook", async (HttpContext context, JellyfinWebhook handler) =>
+app.MapPost("/Jellyfin/Webhook", async (HttpContext context, [FromServices]JellyfinWebhook handler) =>
 {
     var jsonDocument = await JsonDocument.ParseAsync(context.Request.Body);
     var rootElement = jsonDocument.RootElement;
