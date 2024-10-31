@@ -29,5 +29,8 @@ public class JellyfinSettingsValidator : AbstractValidator<JellyfinSettings>
 
         RuleFor(x => x.ApiToken)
             .NotNull().NotEmpty();
+
+        RuleFor(x => x.AdminUser)
+            .NotNull().NotEmpty();
     }
 }

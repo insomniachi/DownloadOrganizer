@@ -11,4 +11,5 @@ public class JellyfinSettings
     public required string WebUrl { get; init; }
     public required string ApiToken { get; init; }
     public required string LocalUrl { get; init; }
+    public required string AdminUser { get; init; }
 }

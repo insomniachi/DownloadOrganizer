@@ -1,12 +1,10 @@
+using System.Text.Json;
 using FluentValidation;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Server.Api;
 
 #if !DEBUG
 using Microsoft.AspNetCore.Hosting;
 #endif
-using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
 #if DEBUG
@@ -42,13 +40,28 @@ builder.Services
 
 var app = builder.Build();
 
-app.MapPost("/Jellyfin/Added", async (JellyfinAddedEvent item,
-    [FromServices] ITelegramBotClient bot,
-    [FromServices] IHttpClientFactory httpClientFactory,
-    [FromServices] IOptions<TelegramSettings> telegramSettings,
-    [FromServices] IOptions<JellyfinSettings> jellyfinSettings) =>
+app.MapPost("/Jellyfin/Webhook", async (HttpContext context, JellyfinWebhook handler) =>
 {
-    await JellyfinWebhook.HandleItemAdded(item, bot, httpClientFactory, jellyfinSettings.Value, telegramSettings.Value);
+    var jsonDocument = await JsonDocument.ParseAsync(context.Request.Body);
+    var rootElement = jsonDocument.RootElement;
+    var notificationType = rootElement.GetProperty("NotificationType").GetString();
+
+    if (string.IsNullOrEmpty(notificationType))
+    {
+        return;
+    }
+
+    await (notificationType switch
+    {
+        "ItemAdded" => handler.HandleItemAdded(rootElement.Deserialize<ItemAdded>()),
+        "AuthenticationSuccess" => handler.HandleAuthenticationSuccess(rootElement.Deserialize<UserAuthorized>()),
+        "PlaybackStart" => handler.HandlerPlaybackStarted(rootElement.Deserialize<PlaybackStarted>()),
+        "PlaybackStop" => handler.HandlerPlaybackStopped(rootElement.Deserialize<PlaybackStopped>()),
+        "PluginUpdated" => handler.HandlePluginUpdated(rootElement.Deserialize<PluginInfo>()),
+        "PluginInstalled" => handler.HandlePluginInstalled(rootElement.Deserialize<PluginInfo>()),
+        _ => Task.CompletedTask
+    });
+
 });
 
 app.Run();
