@@ -66,7 +66,7 @@ public class JellyfinWebhook(ITelegramBotClient bot,
             return;
         }
         
-        await bot.SendTextMessageAsync(_telegramSettings.GroupChatId, $"User {item.NotificationUsername} logged in", protectContent: true);
+        await bot.SendTextMessageAsync(_telegramSettings.GroupChatId, $"<b>{item.NotificationUsername}</b> logged in", protectContent: true);
     }
 
     public async Task HandlerPlaybackStarted(PlaybackStarted? item)
@@ -87,10 +87,14 @@ public class JellyfinWebhook(ITelegramBotClient bot,
         string GetMessage(PlaybackStarted playbackItem)
         {
             var sb = new StringBuilder();
-            sb.Append($"{playbackItem.NotificationUsername} started playing {playbackItem.Name}");
+            sb.Append($"{playbackItem.NotificationUsername} started playing");
             if (playbackItem.ItemType == "Episode")
             {
-                sb.Append($" S{playbackItem.SeasonNumber00}E{playbackItem.EpisodeNumber00} ");
+                sb.Append($"<b>{item.SeriesName} S{playbackItem.SeasonNumber00}E{playbackItem.EpisodeNumber00}</b> ");
+            }
+            else
+            {
+                sb.Append($"<b>{item.Name}</b>");
             }
 
             sb.Append($"from ({playbackItem.PlaybackPosition}/{playbackItem.RunTime}) on {item.DeviceName} ({item.ClientName})");
@@ -119,19 +123,27 @@ public class JellyfinWebhook(ITelegramBotClient bot,
             var sb = new StringBuilder();
             if (playbackItem.PlayedToCompletion)
             {
-                sb.Append($"{playbackItem.NotificationUsername} completed {playbackItem.Name}");
+                sb.Append($"{playbackItem.NotificationUsername} completed");
                 if (playbackItem.ItemType == "Episode")
                 {
-                    sb.Append($" S{playbackItem.SeasonNumber00}E{playbackItem.EpisodeNumber00}");
+                    sb.Append($"<b>{item.SeriesName} S{playbackItem.SeasonNumber00}E{playbackItem.EpisodeNumber00}</b>");
+                }
+                else
+                {
+                    sb.Append($"<b>{item.Name}</b>");
                 }
 
                 return sb.ToString();
             }
             
-            sb.Append($"{playbackItem.NotificationUsername} stopped playing {playbackItem.Name}");
+            sb.Append($"{playbackItem.NotificationUsername} stopped playing");
             if (playbackItem.ItemType == "Episode")
             {
-                sb.Append($" S{playbackItem.SeasonNumber00}E{playbackItem.EpisodeNumber00} ");
+                sb.Append($"<b>{item.SeriesName} S{playbackItem.SeasonNumber00}E{playbackItem.EpisodeNumber00}</b>");
+            }
+            else
+            {
+                sb.Append($"<b>{item.Name}</b>");
             }
 
             sb.Append($"at ({playbackItem.PlaybackPosition}/{playbackItem.RunTime})");

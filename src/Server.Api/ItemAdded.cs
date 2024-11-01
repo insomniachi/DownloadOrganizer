@@ -24,6 +24,7 @@ public class UserAuthorized
 
 public class PlaybackStarted
 {
+    public string SeriesName { get; set; } = string.Empty;
     public string NotificationUsername { get; set; } = string.Empty;
     public string DeviceName { get; set; } = string.Empty;
     public string ClientName { get; set; } = string.Empty;
@@ -37,6 +38,7 @@ public class PlaybackStarted
 
 public class PlaybackStopped
 {
+    public string SeriesName { get; set; } = string.Empty;
     public string NotificationUsername { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string PlaybackPosition { get; set; } = string.Empty;
