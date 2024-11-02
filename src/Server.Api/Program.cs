@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -64,6 +65,22 @@ app.MapPost("/Jellyfin/Webhook", async (HttpContext context, [FromServices]Jelly
         _ => Task.CompletedTask
     });
 
+});
+
+app.MapPost("/vpn", (NordVpnOptions options) =>
+{
+    var args = options.Connect ? "connect" : "disconnect";
+    
+    var process = new Process
+    {
+        StartInfo = new ProcessStartInfo
+        {
+            FileName = "/usr/bin/nordvpn",
+            Arguments = args
+        }
+    };
+
+    process.Start();
 });
 
 app.Run();

@@ -1,6 +1,7 @@
 ﻿using Aria2NET;
 using System.Diagnostics;
 using System.Net.Sockets;
+using System.Text;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
@@ -85,9 +86,52 @@ public class UpdateHandler(
                 {
                     await ReplyDownloadStatus(bot, chatId, message, parts);
                 }
+                else if (messageText.StartsWith("/vpn"))
+                {
+                    await ChangeVpnSettings(bot, chatId, message, parts);
+                }
 
                 break;
             }
+        }
+    }
+
+    private async Task ChangeVpnSettings(ITelegramBotClient bot, long chatId, Message message, string[] parts)
+    {
+        var client = httpClientFactory.CreateClient();
+        const string url = "http://192.168.1.200:4000/vpn";
+        bool connect;
+        if (parts[1] == "connect")
+        {
+            connect = true;
+        }
+        else if (parts[1] == "disconnect")
+        {
+            connect = false;
+        }
+        else
+        {
+            await RequestDenied(bot, message);
+            return;
+        }
+
+        var data = new
+        {
+            Connect = connect
+        };
+        
+        var json = System.Text.Json.JsonSerializer.Serialize(data);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        
+        var response = await client.PostAsync(url, content);
+        
+        if (response.IsSuccessStatusCode)
+        {
+            await bot.SendTextMessageAsync(chatId, connect ? "🔐" : "🔓", replyParameters: message, protectContent: true);
+        }
+        else
+        {
+            await bot.SendTextMessageAsync(chatId, "❌", replyParameters: message, protectContent: true);
         }
     }
 
