@@ -90,7 +90,7 @@ public class JellyfinWebhook(ITelegramBotClient bot,
             sb.Append($"<b>{playbackItem.NotificationUsername}</b> started playing ");
             if (playbackItem.ItemType == "Episode")
             {
-                sb.Append($"<b>{item.SeriesName} S{playbackItem.SeasonNumber00}E{playbackItem.EpisodeNumber00}</b> ");
+                sb.Append($"<b>{item.SeriesName} - {item.Name} - S{playbackItem.SeasonNumber00}E{playbackItem.EpisodeNumber00}</b> ");
             }
             else
             {
@@ -126,7 +126,7 @@ public class JellyfinWebhook(ITelegramBotClient bot,
                 sb.Append($"<b>{playbackItem.NotificationUsername}<b> completed ");
                 if (playbackItem.ItemType == "Episode")
                 {
-                    sb.Append($"<b>{item.SeriesName} S{playbackItem.SeasonNumber00}E{playbackItem.EpisodeNumber00}</b> ");
+                    sb.Append($"<b>{item.SeriesName} - {item.Name} - S{playbackItem.SeasonNumber00}E{playbackItem.EpisodeNumber00}</b> ");
                 }
                 else
                 {

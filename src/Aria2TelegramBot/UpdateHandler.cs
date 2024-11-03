@@ -150,7 +150,7 @@ public class UpdateHandler(
             return;
         }
 
-        var url = parts[2];
+        var url = parts[1];
         var id = await aria2.AddUriAsync([url]);
         await bot.SendTextMessageAsync(chatId, $"download queued gid : `{id}`", replyParameters: message,
             parseMode: ParseMode.Markdown);
