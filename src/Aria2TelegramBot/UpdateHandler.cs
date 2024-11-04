@@ -13,9 +13,11 @@ namespace Aria2TelegramBot;
 public class UpdateHandler(
     Aria2NetClient aria2,
     IHttpClientFactory httpClientFactory,
-    IOptions<TelegramSettings> settings) : IUpdateHandler
+    IOptions<TelegramSettings> telegramSettings,
+    IOptions<Aria2Settings> aria2Settings,
+    IOptions<JellyfinSettings> jellyfinSettings,
+    IOptions<ApiSettings> apiSettings) : IUpdateHandler
 {
-    private readonly long _admin = settings.Value.AdminAccountId;
 
     private readonly string[] _declineMessages =
     [
@@ -49,7 +51,7 @@ public class UpdateHandler(
             return false;
         }
 
-        return user.Id == _admin;
+        return user.Id == telegramSettings.Value.AdminAccountId;
     }
 
     private async Task OnMessage(ITelegramBotClient bot, Message message)
@@ -99,20 +101,19 @@ public class UpdateHandler(
     private async Task ChangeVpnSettings(ITelegramBotClient bot, long chatId, Message message, string[] parts)
     {
         var client = httpClientFactory.CreateClient();
-        const string url = "http://192.168.1.200:4000/vpn";
+        var url = $"http://{apiSettings.Value.Ip}:{apiSettings.Value.Ip}/vpn";
         bool connect;
-        if (parts[1] == "connect")
+        switch (parts[1])
         {
-            connect = true;
-        }
-        else if (parts[1] == "disconnect")
-        {
-            connect = false;
-        }
-        else
-        {
-            await RequestDenied(bot, message);
-            return;
+            case "connect":
+                connect = true;
+                break;
+            case "disconnect":
+                connect = false;
+                break;
+            default:
+                await RequestDenied(bot, message);
+                return;
         }
 
         var data = new
@@ -171,7 +172,7 @@ public class UpdateHandler(
             return;
         }
 
-        var gid = parts[2];
+        var gid = parts[1];
         var status = await aria2.TellStatusAsync(gid);
         await bot.SendTextMessageAsync(chatId,
             $"{status.Gid} : {(status.CompletedLength / status.TotalLength) * 100:F2}", replyParameters: message);
@@ -191,14 +192,13 @@ public class UpdateHandler(
         await bot.SendTextMessageAsync(message.Chat.Id, declineMessage, replyParameters: message);
     }
 
-    private static async Task ServiceStatus(ITelegramBotClient bot, long chatId, Message message)
+    private async Task ServiceStatus(ITelegramBotClient bot, long chatId, Message message)
     {
-        const string ip = "192.168.1.200";
         await bot.SendTextMessageAsync(chatId, $"""
                                                 <pre>
                                                 {GetRow("Service", "ℹ️")}
-                                                {GetRow("Jellyfin", Ping(ip, 8096))}
-                                                {GetRow("Aria2", Ping(ip, 6800))}
+                                                {GetRow("Jellyfin", Ping(jellyfinSettings.Value.Ip, jellyfinSettings.Value.Port))}
+                                                {GetRow("Aria2", Ping(aria2Settings.Value.Ip, aria2Settings.Value.Port))}
                                                 </pre>
                                                 """, parseMode: ParseMode.Html, replyParameters: message);
         return;
@@ -209,7 +209,7 @@ public class UpdateHandler(
         }
     }
 
-    private static async Task WakeOnLan(ITelegramBotClient bot, long chatId, Message message)
+    private async Task WakeOnLan(ITelegramBotClient bot, long chatId, Message message)
     {
         var process = new Process()
         {
@@ -217,7 +217,7 @@ public class UpdateHandler(
             {
                 FileName = "/usr/bin/wakeonlan",
                 WorkingDirectory = "/usr/bin",
-                Arguments = "-i 192.168.1.255 74:56:3C:13:85:83"
+                Arguments = $"-i {apiSettings.Value.BroadcastIp} {apiSettings.Value.MacAddress}"
             }
         };
 

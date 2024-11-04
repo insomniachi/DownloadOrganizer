@@ -38,6 +38,18 @@ builder.Services
     .ValidateFluently()
     .ValidateOnStart();
 
+builder.Services
+    .AddOptions<JellyfinSettings>()
+    .Bind(builder.Configuration.GetRequiredSection("Jellyfin"))
+    .ValidateFluently()
+    .ValidateOnStart();
+
+builder.Services
+    .AddOptions<ApiSettings>()
+    .Bind(builder.Configuration.GetRequiredSection("Api"))
+    .ValidateFluently()
+    .ValidateOnStart();
+
 
 var app = builder.Build();
 
