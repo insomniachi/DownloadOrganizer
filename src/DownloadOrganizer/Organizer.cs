@@ -82,7 +82,13 @@ public static class Organizer
 		}
 		else
 		{
-			var dir = Path.GetFullPath(Path.GetDirectoryName(completedDownload));
+			var dirName = Path.GetDirectoryName(completedDownload);
+			if (string.IsNullOrEmpty(dirName))
+			{
+				return;
+			}
+			
+			var dir = Path.GetFullPath(dirName);
 			var downloadDir = Path.GetFullPath(appSettings.DownloadsDirectory);
 
 			if(dir == downloadDir)
