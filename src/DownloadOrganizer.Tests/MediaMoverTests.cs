@@ -5,8 +5,8 @@ namespace DownloadOrganizer.Tests
 {
     public class MediaMoverTests
 	{
-		public const string DownloadsFolder = @"C:\Downloads";
-		public const string MediaFolder = @"D:\Media";
+		private const string DownloadsFolder = @"C:\Downloads";
+		private const string MediaFolder = @"D:\Media";
 
 		[Fact]
 		public async Task IsAnimeTest()
@@ -17,7 +17,7 @@ namespace DownloadOrganizer.Tests
 		}
 
 		[Fact]
-		public async Task MoverTrimsTamilMVfromName()
+		public async Task MoverTrimsTamilMvFromName()
 		{
 			var movieFolder = Path.Combine(DownloadsFolder, "www 1TamilMV tf - CID Ramachandran Retd  SI (2024) Malayalam TRUE WEB-DL - 1080p - AVC - AAC - 2.9GB - ESub");
 			var destinationFolder = Path.Combine(MediaFolder, "Movies - Malayalam", "CID Ramachandran Retd  SI (2024)");

@@ -6,7 +6,7 @@
 #if DEBUG
 		private static readonly ILogger Logger = new Logger();
 #else
-		private static readonly ILogger _logger = new FileLogger();
+		private static readonly ILogger Logger = new FileLogger();
 #endif
 
 		public static void WriteLog(string msg) => Logger.WriteLine(msg);

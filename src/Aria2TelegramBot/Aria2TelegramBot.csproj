@@ -2,10 +2,11 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UserSecretsId>9263b51f-c7b7-4e71-a4fa-d5e6aa78b692</UserSecretsId>
+    <LangVersion>13</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
