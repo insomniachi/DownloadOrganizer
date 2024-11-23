@@ -64,6 +64,15 @@ public class TorrentNameParserTests
 		Assert.Equal(language, result.languages[0].name);
 	}
 
+	[Theory]
+	[InlineData("www.1TamilMV.at -Idiyan Chandhu (2024) Malayalam TRUE WEB-DL - 1080p - AVC - UNTOUCHED - (DD 2.0 - 224Kbps _ AAC) - 2.2G", @"Idiyan Chandhu")]
+	[InlineData("www.1TamilMV.at - Porattu Nadakam (2024) Malayalam TRUE WEB-DL - 1080p - AVC - (DD 5.1 - 640Kbps _ AAC) - 2.6GB - ESub.m.zip", @"Porattu Nadakam")]
+	public void ParsesTamilMvNames(string name, string expectedResult)
+	{
+		var actual = TorrentNameParser.Parse(name);
+		Assert.Equal(expectedResult, actual.Title);
+	}
+
 	private readonly Dictionary<string, TorrentNameDetails> _expectedResults = new()
 	{
 		// Movies

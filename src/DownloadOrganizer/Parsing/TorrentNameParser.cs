@@ -48,7 +48,7 @@ public static partial class TorrentNameParser
 					{
 						clean = GroupReplaceRegex().Replace(clean, "");
 					}
-
+					
 					var replacements = TorrentNameDetails.GetReplacements(property);
 					if (!string.IsNullOrEmpty(replacements))
 					{
@@ -85,6 +85,13 @@ public static partial class TorrentNameParser
 
 		clean = UndersscoreOrDotRegex().Replace(clean, " ");
 		clean = BracketsRegex().Replace(clean, "").Trim();
+		
+		var tamilMvMatch = TamilMvUrl().Match(clean);
+		if (tamilMvMatch.Success)
+		{
+			clean = clean.Replace(tamilMvMatch.Groups[1].Value, "");
+		}
+		
 		result.Title = clean;
 		result.Name = name;
 
@@ -105,4 +112,7 @@ public static partial class TorrentNameParser
 	
 	[GeneratedRegex(@"([\(_]|- ?)$")]
 	private static partial Regex BracketsRegex();
+
+	[GeneratedRegex(@"(www 1TamilMV \w+\s*-\s*).*")]
+	private static partial Regex TamilMvUrl();
 }

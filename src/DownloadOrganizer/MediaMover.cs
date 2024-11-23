@@ -8,9 +8,6 @@ namespace DownloadOrganizer;
 
 public partial class MediaMover(IFileSystem fileSystem)
 {
-	[GeneratedRegex(@"(www 1TamilMV \w+ - ).*")]
-	private static partial Regex TamilMvUrl();
-
 	private class MediaInfo
 	{
 		public string Name { get; init; }
@@ -74,20 +71,13 @@ public partial class MediaMover(IFileSystem fileSystem)
 		var mkvFiles = fileSystem.GetFiles(fullPath, "*.mkv", SearchOption.AllDirectories);
 		var mp4Files = fileSystem.GetFiles(fullPath, "*.mpv", SearchOption.AllDirectories);
 		var details = TorrentNameParser.Parse(name);
-		var movieName = details.Title;
-		var match = TamilMvUrl().Match(movieName);
-		if (match.Success)
-		{
-			movieName = movieName.Replace(match.Groups[1].Value, "");
-		}
-		
 		return new MediaInfo
 		{
-			Name = movieName,
+			Name = details.Title,
 			Year = details.Year,
 			SeasonNumber = details.Season,
 			IsSeries = mkvFiles.Length > 1 || mp4Files.Length > 1 || details.Season > 0,
-			Language = GetLanguage(movieName)
+			Language = GetLanguage(details.Title)
 		};
 	}
 

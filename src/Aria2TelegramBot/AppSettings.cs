@@ -11,6 +11,7 @@ public class Aria2Settings
 public class TelegramSettings
 {
     public required long AdminAccountId { get; init; }
+    public long[] DownloaderAccountIds { get; set; } = [];
     public required string BotToken { get; init; }
 }
 

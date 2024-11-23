@@ -44,7 +44,7 @@ public class UpdateHandler(
         });
     }
 
-    private bool IsAuthorized(Message message)
+    private bool IsAdmin(Message message)
     {
         if (message.From is not { } user)
         {
@@ -52,6 +52,11 @@ public class UpdateHandler(
         }
 
         return user.Id == telegramSettings.Value.AdminAccountId;
+    }
+    
+    private bool IsDownloader(Message message)
+    {
+        return message.From is { } user && telegramSettings.Value.DownloaderAccountIds.Contains(user.Id);
     }
 
     private async Task OnMessage(ITelegramBotClient bot, Message message)
@@ -138,7 +143,7 @@ public class UpdateHandler(
 
     private async Task DownloadUrl(ITelegramBotClient bot, long chatId, Message message, string[] parts)
     {
-        if (!IsAuthorized(message))
+        if (!(IsAdmin(message) || IsDownloader(message)))
         {
             await RequestDenied(bot, message);
             return;
