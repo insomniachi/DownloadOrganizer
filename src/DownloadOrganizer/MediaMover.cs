@@ -15,6 +15,7 @@ public partial class MediaMover(IFileSystem fileSystem)
 		public int? SeasonNumber { get; init; }
 		public bool IsSeries { get; init; }
 		public string Language { get; init; } = "";
+		public IMDb.Title ImdbItem { get; init; }
 	}
 
 	public async Task<string> MoveFile(string fullPathToFile, string targetBasePath)
@@ -71,13 +72,16 @@ public partial class MediaMover(IFileSystem fileSystem)
 		var mkvFiles = fileSystem.GetFiles(fullPath, "*.mkv", SearchOption.AllDirectories);
 		var mp4Files = fileSystem.GetFiles(fullPath, "*.mpv", SearchOption.AllDirectories);
 		var details = TorrentNameParser.Parse(name);
+		var imdbInfo = GetImdbTitle(details.Title, details.Year);
+		
 		return new MediaInfo
 		{
 			Name = details.Title,
 			Year = details.Year,
 			SeasonNumber = details.Season,
 			IsSeries = mkvFiles.Length > 1 || mp4Files.Length > 1 || details.Season > 0,
-			Language = GetLanguage(details.Title)
+			Language = imdbInfo?.languages.FirstOrDefault()?.name,
+			ImdbItem = imdbInfo,
 		};
 	}
 
@@ -107,6 +111,11 @@ public partial class MediaMover(IFileSystem fileSystem)
 		}
 
 		var mediaFolder = Path.Combine(targetBasePath, subDirectory, newFolderName);
+		if (info.ImdbItem is { } imdbItem)
+		{
+			mediaFolder += $" [imdbid-{imdbItem.id}]";
+		}
+		
 		var seasonFolder = string.Empty;
 
 		if (info.IsSeries)
@@ -127,23 +136,12 @@ public partial class MediaMover(IFileSystem fileSystem)
 		return (mediaFolder, seasonFolder);
 	}
 
-	private static string GetLanguage(string title)
+	public static IMDb.Title GetImdbTitle(string mediaTitle, int year)
 	{
-		try
-		{
-			var imdb = new IMDb.IMDb();
-			var results = imdb.search(title, IMDb.eSearch.Titles);
-			if (results.titles is not { Count: > 0 })
-			{
-				return "";
-			}
-
-			var fullResult = imdb.title(results.titles[0].id);
-			return fullResult.languages[0].name.Trim();
-		}
-		catch (Exception)
-		{
-			return "";
-		}
+		var imdb = new IMDb.IMDb();
+		var results = imdb.search(mediaTitle, IMDb.eSearch.Titles);
+		return results.titles is { Count: > 0 } 
+			? results.titles.Select(result => imdb.title(result.id)).FirstOrDefault(title => title.year == year.ToString())
+			: null;
 	}
 }
