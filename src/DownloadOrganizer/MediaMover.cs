@@ -136,7 +136,7 @@ public partial class MediaMover(IFileSystem fileSystem)
 		return (mediaFolder, seasonFolder);
 	}
 
-	public static IMDb.Title GetImdbTitle(string mediaTitle, int year)
+	private static IMDb.Title GetImdbTitle(string mediaTitle, int year)
 	{
 		var imdb = new IMDb.IMDb();
 		var results = imdb.search(mediaTitle, IMDb.eSearch.Titles);
